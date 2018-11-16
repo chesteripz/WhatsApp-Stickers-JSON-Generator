@@ -1,0 +1,1 @@
+# WhatsApp-Stickers-JSON-Generator
