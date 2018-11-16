@@ -13,7 +13,12 @@ def resize(img,boxSize,img_format):
 	buffer = BytesIO()
 	new_im = Image.new('RGBA', (boxSize, boxSize), (255, 0, 0, 0))
 	new_im.paste(img, ((boxSize-nw)//2,(boxSize-nh)//2))
-	new_im.save(buffer,format=img_format)
+	if img_format=="webp":
+		new_im.save(buffer,format="webp",lossless=True,quality=100)
+	elif img_format=="png":
+		new_im.save(buffer,format="png",optimize=True)
+	else:
+		new_im.save(buffer,format=img_format)
 	myimage = buffer.getvalue()
 	return str(base64.b64encode(myimage), "utf-8")
 
