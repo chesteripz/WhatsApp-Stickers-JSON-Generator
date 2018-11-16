@@ -126,7 +126,7 @@ def generateJSON(metadata,stickers_list,tray_path,dest_name,thread_num):
 	print(i-1,'json(s) have been generated in',"{:.3f}".format(total_time),"s")
 	
 def main(argv):
-	thread_num = 4
+	thread_num = multiprocessing.cpu_count()//2
 	mode=""
 	out=""
 	try:
@@ -150,7 +150,7 @@ def main(argv):
 		usage()
 		sys.exit(2)
 	print("WhatsApp Stickers JSON Generator by Chester")
-	print("verions 1.0")
+	print("verions 1.0.2")
 	for arg in args:
 		if mode=="l":
 			metadata,stickers_list,tray_path,dest_name = download(arg)
@@ -159,6 +159,9 @@ def main(argv):
 		if len(args)==1 and out!="":
 			dest_name=out
 		generateJSON(metadata,stickers_list,tray_path,dest_name,thread_num)
+		if mode=="l":
+			import shutil
+			shutil.rmtree(arg)
 
 if __name__ == '__main__':
 	import time
