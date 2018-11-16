@@ -1,11 +1,11 @@
-# WhatsApp Stickers JSON Generator
+WhatsApp Stickers JSON Generator
 
-# Requirement:
+Requirement:
 - Python 3
 - tested on Windows 10 Pro / Ubuntu / macOS High Sierra
 
-# Usage: 
-main.py <command> <Options>... <inputs (sticker ID or directory)>
+Usage: 
+main.py <command> [<Options>...] [<inputs (sticker ID or directory)>...]
   
 <Commands>
 -l : download LINE stickers and generate JSON
