@@ -72,7 +72,9 @@ def folder(directory):
 			"publisher": directory.name
 		}
 	print(directory)
-	stickers_list=list(directory.glob("[!tray]*.webp"))+list(directory.glob("[!tray]*.png"))
+	stickers_list=[]
+	for ext in ("webp","png","jpeg"):
+		stickers_list.extend(directory.glob("[!tray]*.{}".format(ext)))
 	tray=list(directory.glob("tray*"))
 	if len(tray) < 1:
 		tray_path = stickers_list[0]
