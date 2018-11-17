@@ -127,8 +127,7 @@ def generateJSON(metadata,stickers_list,tray_path,dest_name,thread_num):
 	
 def main(argv):
 	thread_num = multiprocessing.cpu_count()//2
-	mode=""
-	out=""
+	mode=out=""
 	try:
 		opts, args = getopt.getopt(argv,"hldo:t:",["help","output=","threads="])
 	except getopt.GetoptError:
