@@ -2,19 +2,24 @@ WhatsApp Stickers JSON Generator
 
 Requirement:
 - Python 3
-- tested on Windows 10 Pro / Ubuntu / macOS High Sierra
+- tested on Windows 10 Pro / Ubuntu 18.04 / macOS High Sierra
 
-Usage: 
-main.py <command> [<Options>...] [<inputs (sticker ID or directory)>...]
-  
-<Commands>
+Usage:
+main.py <command> [<options>...] [<inputs>...]
+In directory mode, WEBP,JPEG,PNG are supported by default
+
+<commands>
 -l : download LINE stickers and generate JSON
 -d : generate JSON from a directory
 
-<Options>
+<options>
 -t | --threads <number of threads>
 -o | --output  <output JSON filename> (will be ignored if more than one inputs)
-  
+-f | --detination_folder  <output directory>
+
+<inputs>
+LINE Stickers ID / directory depending on your command
+
 Development Environment
 - Python 3.6.3
 - Windows 10 Pro 1809
