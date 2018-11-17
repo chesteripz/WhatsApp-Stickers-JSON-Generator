@@ -3,24 +3,28 @@ from io import BytesIO
 import base64
 	
 def resize(img,boxSize,img_format):
-	nw=boxSize
-	nh=boxSize
-	if img.size[0] < img.size[1]:
-		nw = int(img.size[0]/img.size[1]*nh)
-	else:
-		nh = int(img.size[1]/img.size[0]*nh)
-	img = img.resize((nw, nh), Image.ANTIALIAS)
+	if not (512 in img.size):
+		#only when both dimensions of image are below the boxSize, resize is required.
+		if img.size[0] < img.size[1]:
+			newSize = (int(img.size[0]/img.size[1]*boxSize), boxSize)
+		else:
+			newSize = (boxSize, int(img.size[0]/img.size[1]*boxSize))
+		img = img.resize(newSize, Image.ANTIALIAS)
+
 	buffer = BytesIO()
+	#create an empty image with a size of boxSize * boxSize
 	new_im = Image.new('RGBA', (boxSize, boxSize), (255, 0, 0, 0))
-	new_im.paste(img, ((boxSize-nw)//2,(boxSize-nh)//2))
+	new_im.paste(img, ((boxSize-img.size[0])//2,(boxSize-img.size[1])//2))
+
+	#encode and store the image in buffer
 	if img_format=="webp":
 		new_im.save(buffer,format="webp",lossless=True,quality=100)
 	elif img_format=="png":
 		new_im.save(buffer,format="png",optimize=True)
 	else:
 		new_im.save(buffer,format=img_format)
-	myimage = buffer.getvalue()
-	return str(base64.b64encode(myimage), "utf-8")
+
+	return str(base64.b64encode(buffer.getvalue()), "utf-8")
 
 def conv(path):
 	img = Image.open(path)
@@ -82,18 +86,22 @@ def folder(directory):
 		tray_path = tray[0]
 	
 	print(Style.BRIGHT+metadata["name"]+Style.RESET_ALL,'by', Style.BRIGHT+metadata["publisher"]+Fore.RESET+Style.RESET_ALL)
-	return [metadata,stickers_list,tray_path,directory]
+	return [metadata,stickers_list,tray_path,directory.name]
 	
 def usage():
-	print('Usage: main.py <command> [<options>...] [inputs: <sticker ID> <directory> ... ]')
+	print('Usage: main.py <command> [<options>...] [<inputs>]')
 	print('')
-	print('<Commands>')
+	print('<commands>')
 	print('-l : download LINE stickers and generate JSON')
 	print('-d : generate JSON from a directory')
 	print('')
-	print('<Options>')
+	print('<options>')
 	print('-t | --threads <number of threads>')
 	print('-o | --output  <output JSON filename> (will be ignored if more than one inputs)')
+	print('-f | --detination_folder  <output directory>')
+	print('')
+	print('<inputs>')
+	print('LINE Stickers ID / directory depending on your command')
 
 def generateJSON(metadata,stickers_list,tray_path,dest_name,thread_num):
 	start = time.time()
@@ -129,9 +137,9 @@ def generateJSON(metadata,stickers_list,tray_path,dest_name,thread_num):
 	
 def main(argv):
 	thread_num = multiprocessing.cpu_count()//2
-	mode=out=""
+	mode = out = dest_folder = ""
 	try:
-		opts, args = getopt.getopt(argv,"hldo:t:",["help","output=","threads="])
+		opts, args = getopt.getopt(argv,"hldo:t:f:",["help","output=","threads=","destination_folder="])
 	except getopt.GetoptError:
 		usage()
 		sys.exit(2)
@@ -145,13 +153,15 @@ def main(argv):
 			mode="d"
 		elif opt in ("-o", "--output"):
 			out = arg
+		elif opt in ("-f", "--destination_folder"):
+			dest_folder = arg
 		elif opt in ("-t", "--threads"):
 			thread_num = int(arg)
 	if mode=="":
 		usage()
 		sys.exit(2)
 	print("WhatsApp Stickers JSON Generator by Chester")
-	print("verions 1.0.2")
+	print("verions 1.1.0")
 	for arg in args:
 		if mode=="l":
 			metadata,stickers_list,tray_path,dest_name = download(arg)
@@ -159,7 +169,7 @@ def main(argv):
 			metadata,stickers_list,tray_path,dest_name = folder(Path(arg))
 		if len(args)==1 and out!="":
 			dest_name=out
-		generateJSON(metadata,stickers_list,tray_path,dest_name,thread_num)
+		generateJSON(metadata,stickers_list,tray_path,dest_folder+dest_name,thread_num)
 		if mode=="l":
 			import shutil
 			shutil.rmtree(arg)
